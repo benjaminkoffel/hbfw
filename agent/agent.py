@@ -15,7 +15,7 @@ def write_chain(name, rules):
     old_rules = chain.rules
     for rule in old_rules:
         chain.delete_rule(rule)
-    for rule in rules:
+    for rule in reversed(rules):
         chain.insert_rule(rule)
     table.commit()
     table.refresh()
@@ -39,9 +39,9 @@ def drop_all():
     rule.target = iptc.Target(rule, 'DROP')
     return rule
 
-def create_rule(action, ip, protocol, port):
+def create_rule(ip, protocol, port):
     rule = iptc.Rule()
-    rule.target = iptc.Target(rule, action)
+    rule.target = iptc.Target(rule, 'ACCEPT')
     rule.src = ip
     rule.protocol = protocol
     match = rule.create_match(protocol)
@@ -54,8 +54,8 @@ def update_iptables(policy):
     rules.append(accept_localhost())
     rules.append(accept_related_established())
     for p in policy:
-        for action, ip, port in p.split():
-            rules.append(create_rule(action, ip, 'tcp', port))
+        v = p.split()
+        rules.append(create_rule(v[0], v[1], v[2]))
     rules.append(drop_all())
     write_chain('INPUT', rules)
 
@@ -73,7 +73,7 @@ def poll(interval, uri, token):
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--config')
+    parser.add_argument('--config', default='agent/config.yaml')
     args = parser.parse_args()
     with open(args.config, 'r') as f:
         config = yaml.load(f)

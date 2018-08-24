@@ -96,7 +96,7 @@ def select_rules(config, hosts, tags):
                 else:
                     expanded.append(rule)
             return expanded
-    return ['DROP']
+    return []
 
 def authorize_admin(function):
     @functools.wraps(function)

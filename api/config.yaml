@@ -2,4 +2,4 @@ uri: http://localhost:4444
 key: 8poWbFjKKEtaVq2cBPqeTGhKkpFRWKIXsT3xsvcq
 rules:
     WORKSTATION:
-        - ALLOW TAG:WORKSTATION 80
+        - TAG:WORKSTATION tcp 80
