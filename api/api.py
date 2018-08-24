@@ -150,9 +150,10 @@ def issue():
 def poll():
     id = flask.g.identity['claims']['jti']
     tags = flask.g.identity['claims']['scope'].split(' ')
+    ip = flask.request.remote_addr
     HOSTS[id] = {
         'tags': tags,
-        'ip': flask.request.remote_addr,
+        'ip': ip,
         'time': int(time.time())
     }
     return json.dumps(select_rules(CONFIG, HOSTS, tags))
