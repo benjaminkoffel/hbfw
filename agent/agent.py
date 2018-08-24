@@ -51,7 +51,7 @@ def create_rule(action, ip, protocol, port):
 
 def update_iptables(policy):
     rules = [accept_localhost(), accept_related_established()]
-    rules += [create_rule(action, ip, 'tcp', port) for action, ip, protocol, port in policy]
+    rules += [create_rule(action, ip, 'tcp', port) for action, ip, port in policy]
     rules += [drop_all()]
     write_chain('INPUT', rules)
 
