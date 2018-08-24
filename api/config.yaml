@@ -3,4 +3,3 @@ key: 8poWbFjKKEtaVq2cBPqeTGhKkpFRWKIXsT3xsvcq
 rules:
     WORKSTATION:
         - ALLOW TAG:WORKSTATION 80
-        - DROP

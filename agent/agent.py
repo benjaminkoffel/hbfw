@@ -9,12 +9,16 @@ import yaml
 logging.basicConfig(level=logging.INFO)
 
 def write_chain(name, rules):
-    chain = iptc.Chain(iptc.Table(iptc.Table.FILTER), name)
+    table = iptc.Table(iptc.Table.FILTER)
+    table.autocommit = False
+    chain = iptc.Chain(table, name)
     old_rules = chain.rules
     for rule in old_rules:
         chain.delete_rule(rule)
     for rule in rules:
         chain.insert_rule(rule)
+    table.commit()
+    table.refresh()
 
 def accept_localhost():
     rule = iptc.Rule()
@@ -35,13 +39,20 @@ def drop_all():
     rule.target = iptc.Target(rule, 'DROP')
     return rule
 
+def create_rule(action, ip, protocol, port):
+    rule = iptc.Rule()
+    rule.target = iptc.Target(rule, action)
+    rule.src = ip
+    rule.protocol = protocol
+    match = rule.create_match(protocol)
+    match.dport = port
+    rule.add_match(match)
+    return rule
+
 def update_iptables(policy):
-    rules = [
-        accept_localhost(),
-        accept_related_established(),
-        # todo: apply hbfw rules
-        # todo: drop_all()
-    ]
+    rules = [accept_localhost(), accept_related_established()]
+    rules += [create_rule(action, ip, 'tcp', port) for action, ip, protocol, port in policy]
+    rules += [drop_all()]
     write_chain('INPUT', rules)
 
 def poll(interval, uri, token):
