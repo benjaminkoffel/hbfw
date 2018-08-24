@@ -8,6 +8,19 @@ import yaml
 
 logging.basicConfig(level=logging.INFO)
 
+def update_iptables6():
+    table = iptc.Table6(iptc.Table6.FILTER)
+    table.autocommit = False
+    chain = iptc.Chain(table, 'INPUT')
+    old_rules = chain.rules
+    for rule in old_rules:
+        chain.delete_rule(rule)
+    rule = iptc.Rule6()
+    rule.target = iptc.Target(rule, 'DROP')
+    chain.insert_rule(rule)
+    table.commit()
+    table.refresh()
+    
 def write_chain(name, rules):
     table = iptc.Table(iptc.Table.FILTER)
     table.autocommit = False
@@ -66,6 +79,7 @@ def poll(interval, uri, token):
             response = requests.get(uri, headers=headers)
             policy = response.json()
             update_iptables(policy)
+            update_iptables6()
             logging.info('%d %s', response.status_code, policy)
         except Exception as e:
             logging.error(e)
