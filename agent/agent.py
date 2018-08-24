@@ -50,9 +50,13 @@ def create_rule(action, ip, protocol, port):
     return rule
 
 def update_iptables(policy):
-    rules = [accept_localhost(), accept_related_established()]
-    rules += [create_rule(action, ip, 'tcp', port) for action, ip, port in policy]
-    rules += [drop_all()]
+    rules = []
+    rules.append(accept_localhost())
+    rules.append(accept_related_established())
+    for p in policy:
+        for action, ip, port in p.split():
+            rules.append(create_rule(action, ip, 'tcp', port))
+    rules.append(drop_all())
     write_chain('INPUT', rules)
 
 def poll(interval, uri, token):
