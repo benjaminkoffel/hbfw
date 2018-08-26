@@ -47,7 +47,7 @@ def update_iptables(policy):
     policies = [p.split() for p in policy]
     for chain in ['INPUT', 'OUTPUT', 'FORWARD']:
         rules = [accept_localhost(iptc.Rule6()), accept_related_established(iptc.Rule6())]
-        rules += [create_rule(iptc.Rule(), p[1], p[2], p[3], p[4]) if len(p) > 2 else create_rule(iptc.Rule(), p[1], None, None, None) for p in policies where p[0] == chain]
+        rules += [create_rule(iptc.Rule(), p[1], p[2], p[3], p[4]) if len(p) > 2 else create_rule(iptc.Rule(), p[1], None, None, None) for p in policies if p[0] == chain]
         write_chain(iptc.Table(iptc.Table.FILTER), chain, rules)
         write_chain(iptc.Table6(iptc.Table6.FILTER), chain, [create_rule(iptc.Rule6(), 'DROP', None, None, None)])
 
