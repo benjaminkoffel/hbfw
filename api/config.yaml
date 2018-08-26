@@ -2,4 +2,9 @@ uri: http://localhost:4444
 key: 8poWbFjKKEtaVq2cBPqeTGhKkpFRWKIXsT3xsvcq
 rules:
     WORKSTATION:
-        - TAG:WORKGROUP tcp 80
+        - INPUT ACCEPT 0.0.0.0/0 tcp 22
+        - INPUT ACCEPT TAG:WORKGROUP tcp 80
+        - INPUT DROP
+        - OUTPUT ACCEPT TAG:WORKGROUP tcp 80
+        - OUTPUT DROP
+        - FORWARD DROP
